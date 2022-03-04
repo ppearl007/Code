@@ -10,32 +10,47 @@ const app = express()
 //get / is home page. 
 //then get /endpoint is for another page
 
-articles = []
+const newspapers = [
+    {
+        name: 'the guardian',
+        address: 'https://www.theguardian.com/environment/climate-crisis'
+    },
+    {
+        name: 'the times',
+        address: 'https://www.thetimes.co.uk/environment/climate-change'
+    },
+
+]
+
+const articles = []
 
 app.get('/', (req, res) => {
     res.json('Welcome to my climate change news API')
 
 })
 
-app.get('/news', (req, res) => {
-
-    axios.get('https://www.theguardian.com/environment/climate-crisis')
-    .then((response) => {
-        const html = response.data
-        const $ = cheerio.load(html)  
-        
-        $('a:contains("climate")', html).each(function () {
-            const title = $(this).text()
-            const url = $(this).attr('href')
-
-            articles.push({
-                title,
-                url
+newspapers.forEach(newspaper => {
+    axios.get(newspaper.address)
+        .then((response) => {
+            const html = response.data
+            const $ = cheerio.load(html)  
+            
+            $('a:contains("climate")', html).each(function () {
+                const title = $(this).text()
+                const url = $(this).attr('href')
+                const source = newspaper.name
+    
+                articles.push({
+                    title,
+                    url,
+                    source
+                })
             })
-        })
-        res.json(articles)
-    }).catch((err) => console.log(err))
+        }).catch((err) => console.log(err))
+})
 
+app.get('/news', (req, res) => {
+        res.json(articles)
 })
 
 app.listen(PORT, () => console.log(`Server running on Port ${PORT}`))
