@@ -50,7 +50,12 @@ newspapers.forEach(newspaper => {
 })
 
 app.get('/news', (req, res) => {
-        res.json(articles)
+    res.json(articles)
+})
+
+app.get('/close', (req, res) => {
+    res.json("Exiting server")
+    process.exit()
 })
 
 app.listen(PORT, () => console.log(`Server running on Port ${PORT}`))
